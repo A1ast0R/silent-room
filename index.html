@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Silent Room</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      font-family: monospace;
+      color: #ccc;
+    }
+    #fogCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
+    #background {
+      background: url('assets/sh2_corridor.jpg') no-repeat center center;
+      background-size: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      filter: brightness(0.4) grayscale(0.8);
+    }
+    #text {
+      position: absolute;
+      bottom: 10vh;
+      width: 100%;
+      text-align: center;
+      font-size: 1.6em;
+      z-index: 2;
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 0 0 5px #000;
+    }
+    #fade {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      opacity: 0;
+      transition: opacity 3s;
+      z-index: 3;
+      pointer-events: none;
+    }
+    #vhs {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 4;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0.02) 1px,
+        transparent 2px,
+        transparent 4px
+      );
+      pointer-events: none;
+      animation: flicker 0.3s infinite;
+    }
+    @keyframes flicker {
+      0% { opacity: 0.02; }
+      50% { opacity: 0.03; }
+      100% { opacity: 0.01; }
+    }
+  </style>
+</head>
+<body>
+  <div id="background"></div>
+  <canvas id="fogCanvas"></canvas>
+  <div id="text">There was a HOLE here. It’s gone now.</div>
+  <div id="fade"></div>
+  <div id="vhs"></div>
+  <audio id="bgSound" src="assets/white-noise.mp3" loop autoplay></audio>
+
+  <script>
+    const canvas = document.getElementById("fogCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const fogImage = new Image();
+    fogImage.src = 'assets/fog-texture.png';
+
+    let fogX = 0;
+    function drawFog() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      fogX -= 0.3;
+      if (fogX < -canvas.width) fogX = 0;
+      ctx.globalAlpha = 0.2;
+      ctx.drawImage(fogImage, fogX, 0, canvas.width, canvas.height);
+      ctx.drawImage(fogImage, fogX + canvas.width, 0, canvas.width, canvas.height);
+      requestAnimationFrame(drawFog);
+    }
+    fogImage.onload = drawFog;
+
+    let fade = document.getElementById('fade');
+    let timeout;
+    function resetFadeTimer() {
+      clearTimeout(timeout);
+      fade.style.opacity = 0;
+      timeout = setTimeout(() => {
+        fade.style.opacity = 0.8;
+      }, 10000);
+    }
+    document.onmousemove = resetFadeTimer;
+    document.onkeydown = resetFadeTimer;
+    resetFadeTimer();
+
+    const text = document.getElementById('text');
+    const phrases = [
+      "There was a HOLE here. It’s gone now.",
+      "I'm sorry, Mary...",
+      "This town... it called me.",
+      "I needed you. Not anymore.",
+      "Monsters? They look like monsters to you?"
+    ];
+    let phraseIndex = 0;
+    setInterval(() => {
+      phraseIndex = (phraseIndex + 1) % phrases.length;
+      text.innerText = phrases[phraseIndex];
+    }, 12000);
+
+    const flash = document.createElement('div');
+    flash.style.position = 'absolute';
+    flash.style.top = '0';
+    flash.style.left = '0';
+    flash.style.width = '100vw';
+    flash.style.height = '100vh';
+    flash.style.background = "url('assets/silhouette.png') no-repeat center center / cover";
+    flash.style.zIndex = '5';
+    flash.style.opacity = '0';
+    flash.style.transition = 'opacity 0.5s';
+    document.body.appendChild(flash);
+
+    setInterval(() => {
+      if (Math.random() < 0.1) {
+        flash.style.opacity = '0.3';
+        setTimeout(() => flash.style.opacity = '0', 500);
+      }
+    }, 8000);
+  </script>
+</body>
+</html>
