@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <title>Silent Room</title>
@@ -70,6 +70,26 @@
       pointer-events: none;
       animation: flicker 0.3s infinite;
     }
+    #shadow {
+      position: absolute;
+      bottom: 0;
+      left: -20vw;
+      width: 20vw;
+      height: 20vh;
+      background: url('assets/shadow.png') no-repeat center center / contain;
+      opacity: 0.2;
+      z-index: 1;
+      animation: slideShadow 10s linear infinite;
+    }
+
+    @keyframes slideShadow {
+      0% { left: -20vw; opacity: 0; }
+      10% { opacity: 0.3; }
+      50% { left: 50vw; opacity: 0.2; }
+      90% { opacity: 0.3; }
+      100% { left: 120vw; opacity: 0; }
+    }
+
     @keyframes flicker {
       0% { opacity: 0.02; }
       50% { opacity: 0.03; }
@@ -80,10 +100,11 @@
 <body>
   <div id="background"></div>
   <canvas id="fogCanvas"></canvas>
-  <div id="text">There was a HOLE here. It’s gone now.</div>
+  <div id="text">Здесь была ДЫРА. Теперь её нет.</div>
   <div id="fade"></div>
   <div id="vhs"></div>
-  <audio id="bgSound" src="assets/white-noise.mp3" loop autoplay></audio>
+  <div id="shadow"></div>
+  <audio id="bgSound" src="assets/white-noise.mp3" loop autoplay muted></audio>
 
   <script>
     const canvas = document.getElementById("fogCanvas");
@@ -121,11 +142,11 @@
 
     const text = document.getElementById('text');
     const phrases = [
-      "There was a HOLE here. It’s gone now.",
-      "I'm sorry, Mary...",
-      "This town... it called me.",
-      "I needed you. Not anymore.",
-      "Monsters? They look like monsters to you?"
+      "Здесь была ДЫРА. Теперь её нет.",
+      "Прости меня, Мэри...",
+      "Этот город... он позвал меня.",
+      "Я нуждался в тебе. Но больше — нет.",
+      "Монстры? Тебе они выглядят как монстры?"
     ];
     let phraseIndex = 0;
     setInterval(() => {
@@ -139,7 +160,8 @@
     flash.style.left = '0';
     flash.style.width = '100vw';
     flash.style.height = '100vh';
-    flash.style.background = "url('assets/silhouette.png') no-repeat center center / cover";
+    flash.style.background = "black url('assets/silhouette.png') no-repeat center center";
+    flash.style.backgroundSize = 'contain';
     flash.style.zIndex = '5';
     flash.style.opacity = '0';
     flash.style.transition = 'opacity 0.5s';
@@ -151,6 +173,12 @@
         setTimeout(() => flash.style.opacity = '0', 500);
       }
     }, 8000);
+
+    const audio = document.getElementById('bgSound');
+    document.body.addEventListener('click', () => {
+      audio.muted = false;
+      audio.play().catch(() => {});
+    });
   </script>
 </body>
 </html>
