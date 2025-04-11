@@ -104,7 +104,7 @@
   <div id="fade"></div>
   <div id="vhs"></div>
   <div id="shadow"></div>
-  <audio id="bgSound" src="assets/white-noise.mp3" loop autoplay muted></audio>
+  <audio id="bgSound" loop></audio>
 
   <script>
     const canvas = document.getElementById("fogCanvas");
@@ -176,6 +176,9 @@
 
     const audio = document.getElementById('bgSound');
     document.body.addEventListener('click', () => {
+      if (!audio.src) {
+        audio.src = "assets/white-noise.mp3";
+      }
       audio.muted = false;
       audio.play().catch(() => {});
     });
